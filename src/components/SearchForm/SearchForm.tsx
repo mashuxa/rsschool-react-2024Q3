@@ -1,7 +1,7 @@
-import React, { Component, FormEvent, ChangeEvent } from 'react';
+import { Component, FormEvent, ChangeEvent } from 'react';
 
-import { fetcher } from '../../api/fetcher.ts';
-import { Film } from '../../types.ts';
+import { fetcher } from '../../api/fetcher';
+import { Film } from '../../types';
 
 export const SEARCH_STORAGE_KEY = 'search';
 interface SearchFormProps {
@@ -12,9 +12,12 @@ interface SearchFormState {
   search: string;
   isLoading: boolean;
 }
+interface FetchDataType {
+  results: Film[];
+}
 
 class SearchForm extends Component<SearchFormProps, SearchFormState> {
-  constructor(props) {
+  constructor(props: SearchFormProps) {
     super(props);
 
     this.state = {
@@ -30,16 +33,18 @@ class SearchForm extends Component<SearchFormProps, SearchFormState> {
       searchParams.set('search', this.state.search);
     }
 
-    this.setState({ isLoading: true });
+    this.setState<'isLoading'>({ isLoading: true });
 
-    const { results } = await fetcher(`?${searchParams.toString()}`).catch(() => ({ results: [] }));
+    const { results } = await fetcher<FetchDataType>(`?${searchParams.toString()}`).catch(() => ({
+      results: [],
+    }));
 
-    this.setState({ isLoading: false });
+    this.setState<'isLoading'>({ isLoading: false });
     this.props.onSuccess(results);
   };
 
   handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    this.setState({ search: event.target.value.trim() });
+    this.setState<'search'>({ search: event.target.value.trim() });
   };
 
   handleSubmit = (event: FormEvent) => {
@@ -50,7 +55,7 @@ class SearchForm extends Component<SearchFormProps, SearchFormState> {
   };
 
   componentDidMount() {
-    this.fetchData();
+    void this.fetchData();
   }
 
   render() {
@@ -58,7 +63,7 @@ class SearchForm extends Component<SearchFormProps, SearchFormState> {
       <div>
         <form
           onSubmit={this.handleSubmit}
-          className="flex flex-col card space-y-4 p-6 mt-10 rounded-lg shadow-sm bg-white"
+          className="flex flex-col card space-y-4 p-6 mt-6 rounded-lg shadow-sm bg-white"
         >
           <input
             type="text"

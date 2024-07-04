@@ -1,4 +1,4 @@
 export interface Film {
   title: string;
-  description: string;
+  opening_crawl: string;
 }
