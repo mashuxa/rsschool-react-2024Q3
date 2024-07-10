@@ -1,89 +1,81 @@
-import { Component, FormEvent, ChangeEvent } from 'react';
-
+import { FormEvent, ChangeEvent, FC, useState, useCallback, useEffect } from 'react';
 import { fetcher } from '../../api/fetcher';
 import { Film } from '../../types';
+import useLocalStorage from '../../hooks/useLocalStorage/useLocalStorage.ts';
 
 export const SEARCH_STORAGE_KEY = 'search';
 interface SearchFormProps {
   onSuccess: (films: Film[]) => void;
 }
 
-interface SearchFormState {
-  search: string;
-  isLoading: boolean;
-}
 interface FetchDataType {
   results: Film[];
 }
+const SearchForm: FC<SearchFormProps> = ({ onSuccess }) => {
+  const [initialSearchValue, updateLocalStorage] = useLocalStorage(SEARCH_STORAGE_KEY);
+  const [search, setSearch] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-class SearchForm extends Component<SearchFormProps, SearchFormState> {
-  constructor(props: SearchFormProps) {
-    super(props);
+  const fetchData = useCallback(
+    async (searchValue: string) => {
+      const searchParams = new URLSearchParams([['page', '1']]);
 
-    this.state = {
-      search: localStorage.getItem(SEARCH_STORAGE_KEY) || '',
-      isLoading: false,
-    };
-  }
+      if (searchValue) {
+        searchParams.set('search', searchValue);
+      }
 
-  fetchData = async () => {
-    const searchParams = new URLSearchParams([['page', '1']]);
+      setIsLoading(true);
 
-    if (this.state.search) {
-      searchParams.set('search', this.state.search);
-    }
+      const { results } = await fetcher<FetchDataType>(`?${searchParams.toString()}`).catch(() => ({ results: [] }));
 
-    this.setState<'isLoading'>({ isLoading: true });
+      setIsLoading(false);
+      onSuccess(results);
+    },
+    [onSuccess],
+  );
+  const handleSubmit = useCallback(
+    (event: FormEvent) => {
+      event.preventDefault();
+      updateLocalStorage(search);
+      void fetchData(search);
+    },
+    [fetchData, search, updateLocalStorage],
+  );
+  const handleChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      setSearch(event.target.value.trim());
+    },
+    [setSearch],
+  );
 
-    const { results } = await fetcher<FetchDataType>(`?${searchParams.toString()}`).catch(() => ({
-      results: [],
-    }));
+  useEffect(() => {
+    const initial = initialSearchValue.current as string;
 
-    this.setState<'isLoading'>({ isLoading: false });
-    this.props.onSuccess(results);
-  };
+    setSearch(initial);
+    void fetchData(initial);
+  }, [fetchData, initialSearchValue]);
 
-  handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    this.setState<'search'>({ search: event.target.value.trim() });
-  };
-
-  handleSubmit = (event: FormEvent) => {
-    event.preventDefault();
-
-    localStorage.setItem(SEARCH_STORAGE_KEY, this.state.search);
-    void this.fetchData();
-  };
-
-  componentDidMount() {
-    void this.fetchData();
-  }
-
-  render() {
-    return (
-      <div>
-        <form
-          onSubmit={this.handleSubmit}
-          className="flex flex-col card space-y-4 p-6 mt-6 rounded-lg shadow-sm bg-white"
+  return (
+    <div>
+      <form onSubmit={handleSubmit} className="flex flex-col card space-y-4 p-6 mt-6 rounded-lg shadow-sm bg-white">
+        <input
+          type="text"
+          value={search}
+          onChange={handleChange}
+          placeholder="Search..."
+          className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          type="submit"
+          className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          disabled={isLoading}
         >
-          <input
-            type="text"
-            value={this.state.search}
-            onChange={this.handleChange}
-            placeholder="Search..."
-            className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            type="submit"
-            className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={this.state.isLoading}
-          >
-            Submit
-          </button>
-        </form>
-        <div className="text-center p-2">{this.state.isLoading && 'Loading..'}</div>
-      </div>
-    );
-  }
-}
+          Submit
+        </button>
+      </form>
+      <div className="text-center p-2">{isLoading && 'Loading..'}</div>
+    </div>
+  );
+};
 
 export default SearchForm;
