@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { MutableRefObject, useCallback, useEffect, useRef } from 'react';
 
-const useLocalStorage = (key: string) => {
+type UseLocalStorageReturnType = [MutableRefObject<string>, (value: string) => void];
+
+const useLocalStorage = (key: string): UseLocalStorageReturnType => {
   const value = useRef<string>('');
   const updateLocalStorageValue = useCallback(
     (newValue: string): void => {

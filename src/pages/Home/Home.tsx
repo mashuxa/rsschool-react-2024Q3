@@ -1,26 +1,25 @@
 import { FC } from 'react';
 
-import { Film } from '../../types';
+import { FetchDataType, Person } from '../../types';
 import SearchForm from '../../components/SearchForm/SearchForm';
-import FilmCard from '../../components/FilmCard/FilmCard';
+import PersonCard from '../../components/PersonCard/PersonCard.tsx';
 import { useState } from 'react';
+import Pagination from '../../components/Pagination/Pagination.tsx';
 
-interface Film {
-  title: string;
-  opening_crawl: string;
-}
+const DEFAULT_PAGE = 1;
 
 const Home: FC = () => {
-  const [films, setFilms] = useState<Film[]>([]);
+  const [data, setData] = useState<FetchDataType<Person>>({ count: 0, results: [] });
+  const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE);
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-lg mx-auto">
-        <SearchForm onSuccess={setFilms} />
+        <SearchForm onSuccess={setData} page={currentPage} setPage={setCurrentPage} />
+        <Pagination currentPage={currentPage} setCurrentPage={setCurrentPage} totalCount={data.count} />
         <div className="mt-6 space-y-4 p-6 border border-gray-300 rounded-md">
-          <h2>Search results: {films.length}</h2>
-          {films.map(({ title, opening_crawl }, index) => (
-            <FilmCard key={index} title={title} description={opening_crawl} />
+          {data.results.map((data, index) => (
+            <PersonCard key={index} {...data} />
           ))}
         </div>
       </div>

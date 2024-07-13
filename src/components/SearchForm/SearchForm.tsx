@@ -1,24 +1,28 @@
-import { FormEvent, ChangeEvent, FC, useState, useCallback, useEffect } from 'react';
+import { FormEvent, FC, useState, useCallback, useEffect, useRef } from 'react';
 import { fetcher } from '../../api/fetcher';
-import { Film } from '../../types';
 import useLocalStorage from '../../hooks/useLocalStorage/useLocalStorage.ts';
+import { FetchDataType, Person } from '../../types.ts';
 
 export const SEARCH_STORAGE_KEY = 'search';
+const DEFAULT_RESULT = {
+  results: [],
+  count: 0,
+};
 interface SearchFormProps {
-  onSuccess: (films: Film[]) => void;
+  setPage: (page: number) => void;
+  onSuccess: (data: FetchDataType<Person>) => void;
+  page: number;
 }
 
-interface FetchDataType {
-  results: Film[];
-}
-const SearchForm: FC<SearchFormProps> = ({ onSuccess }) => {
+const SearchForm: FC<SearchFormProps> = ({ onSuccess, page, setPage }) => {
   const [initialSearchValue, updateLocalStorage] = useLocalStorage(SEARCH_STORAGE_KEY);
-  const [search, setSearch] = useState<string>('');
+  const [search, setSearch] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const fetchData = useCallback(
-    async (searchValue: string) => {
-      const searchParams = new URLSearchParams([['page', '1']]);
+    async (searchValue: string, page: number) => {
+      const searchParams = new URLSearchParams([['page', page.toString()]]);
 
       if (searchValue) {
         searchParams.set('search', searchValue);
@@ -26,7 +30,7 @@ const SearchForm: FC<SearchFormProps> = ({ onSuccess }) => {
 
       setIsLoading(true);
 
-      const { results } = await fetcher<FetchDataType>(`?${searchParams.toString()}`).catch(() => ({ results: [] }));
+      const results = await fetcher<FetchDataType<Person>>(`?${searchParams.toString()}`).catch(() => DEFAULT_RESULT);
 
       setIsLoading(false);
       onSuccess(results);
@@ -36,32 +40,38 @@ const SearchForm: FC<SearchFormProps> = ({ onSuccess }) => {
   const handleSubmit = useCallback(
     (event: FormEvent) => {
       event.preventDefault();
-      updateLocalStorage(search);
-      void fetchData(search);
+
+      if (inputRef.current) {
+        setSearch(inputRef.current.value);
+        updateLocalStorage(inputRef.current.value);
+      }
+
+      setPage(1);
     },
-    [fetchData, search, updateLocalStorage],
-  );
-  const handleChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      setSearch(event.target.value.trim());
-    },
-    [setSearch],
+    [setPage, updateLocalStorage],
   );
 
   useEffect(() => {
-    const initial = initialSearchValue.current as string;
+    const initial = initialSearchValue.current;
 
-    setSearch(initial);
-    void fetchData(initial);
-  }, [fetchData, initialSearchValue]);
+    if (inputRef.current) {
+      setSearch(initial);
+      inputRef.current.value = initial;
+    }
+  }, [initialSearchValue]);
+
+  useEffect(() => {
+    if (search !== null) {
+      void fetchData(search, page);
+    }
+  }, [fetchData, page, search]);
 
   return (
     <div>
       <form onSubmit={handleSubmit} className="flex flex-col card space-y-4 p-6 mt-6 rounded-lg shadow-sm bg-white">
         <input
+          ref={inputRef}
           type="text"
-          value={search}
-          onChange={handleChange}
           placeholder="Search..."
           className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -73,7 +83,9 @@ const SearchForm: FC<SearchFormProps> = ({ onSuccess }) => {
           Submit
         </button>
       </form>
-      <div className="text-center p-2">{isLoading && 'Loading..'}</div>
+      <div className="flex-row">
+        <div className="text-center p-2">{isLoading && 'Loading..'}</div>
+      </div>
     </div>
   );
 };
