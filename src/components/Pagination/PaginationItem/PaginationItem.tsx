@@ -1,15 +1,17 @@
 import { FC, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 interface PaginationItemProps {
-  page: number;
-  onClick: (page: number) => void;
+  page: string;
+  onClick: (page: string) => void;
   isActive: boolean;
 }
 
-const PaginationItem: FC<PaginationItemProps> = ({ page, onClick, isActive }) => {
+const PaginationItem: FC<PaginationItemProps> = ({ page, isActive }) => {
+  const [, setSearchParams] = useSearchParams();
   const handleClick = useCallback(() => {
-    onClick(page);
-  }, [onClick, page]);
+    setSearchParams({ page: page.toString() });
+  }, [page, setSearchParams]);
 
   return (
     <button

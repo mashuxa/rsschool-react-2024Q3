@@ -2,6 +2,9 @@ import { FormEvent, FC, useState, useCallback, useEffect, useRef } from 'react';
 import { fetcher } from '../../api/fetcher';
 import useLocalStorage from '../../hooks/useLocalStorage/useLocalStorage.ts';
 import { FetchDataType, Person } from '../../types.ts';
+import Preloader from '../Preloader/Preloader.tsx';
+import { useSearchParams } from 'react-router-dom';
+import { DEFAULT_PAGE } from '../Pagination/Pagination.tsx';
 
 export const SEARCH_STORAGE_KEY = 'search';
 const DEFAULT_RESULT = {
@@ -9,20 +12,19 @@ const DEFAULT_RESULT = {
   count: 0,
 };
 interface SearchFormProps {
-  setPage: (page: number) => void;
   onSuccess: (data: FetchDataType<Person>) => void;
-  page: number;
 }
 
-const SearchForm: FC<SearchFormProps> = ({ onSuccess, page, setPage }) => {
-  const [initialSearchValue, updateLocalStorage] = useLocalStorage(SEARCH_STORAGE_KEY);
+const SearchForm: FC<SearchFormProps> = ({ onSuccess }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState<string | null>(null);
+  const updateLocalStorage = useLocalStorage(SEARCH_STORAGE_KEY, setSearch);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const fetchData = useCallback(
-    async (searchValue: string, page: number) => {
-      const searchParams = new URLSearchParams([['page', page.toString()]]);
+    async (searchValue: string, page: string) => {
+      const searchParams = new URLSearchParams([['page', page]]);
 
       if (searchValue) {
         searchParams.set('search', searchValue);
@@ -42,34 +44,31 @@ const SearchForm: FC<SearchFormProps> = ({ onSuccess, page, setPage }) => {
       event.preventDefault();
 
       if (inputRef.current) {
-        setSearch(inputRef.current.value);
         updateLocalStorage(inputRef.current.value);
+        setSearchParams({ page: DEFAULT_PAGE });
+        setSearch(inputRef.current.value);
       }
-
-      setPage(1);
     },
-    [setPage, updateLocalStorage],
+    [setSearchParams, updateLocalStorage],
   );
 
   useEffect(() => {
-    const initial = initialSearchValue.current;
-
-    if (inputRef.current) {
-      setSearch(initial);
-      inputRef.current.value = initial;
+    if (!searchParams.get('page')) {
+      setSearchParams((prev) => `${prev.toString()}&page=${DEFAULT_PAGE}`);
     }
-  }, [initialSearchValue]);
+  }, [searchParams, setSearchParams]);
 
   useEffect(() => {
     if (search !== null) {
-      void fetchData(search, page);
+      void fetchData(search, searchParams.get('page') || DEFAULT_PAGE);
     }
-  }, [fetchData, page, search]);
+  }, [fetchData, search, searchParams]);
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="flex flex-col card space-y-4 p-6 mt-6 rounded-lg shadow-sm bg-white">
+      <form onSubmit={handleSubmit} className="flex flex-col card space-y-4 p-6 rounded-lg shadow-sm bg-white">
         <input
+          defaultValue={search || ''}
           ref={inputRef}
           type="text"
           placeholder="Search..."
@@ -84,7 +83,7 @@ const SearchForm: FC<SearchFormProps> = ({ onSuccess, page, setPage }) => {
         </button>
       </form>
       <div className="flex-row">
-        <div className="text-center p-2">{isLoading && 'Loading..'}</div>
+        <div className="text-center p-2">{isLoading && <Preloader />}</div>
       </div>
     </div>
   );

@@ -1,9 +1,8 @@
-import { MutableRefObject, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 
-type UseLocalStorageReturnType = [MutableRefObject<string>, (value: string) => void];
+type UseLocalStorageReturnType = (value: string) => void;
 
-const useLocalStorage = (key: string): UseLocalStorageReturnType => {
-  const value = useRef<string>('');
+const useLocalStorage = (key: string, onInit: (value: string) => void): UseLocalStorageReturnType => {
   const updateLocalStorageValue = useCallback(
     (newValue: string): void => {
       localStorage.setItem(key, newValue);
@@ -12,10 +11,10 @@ const useLocalStorage = (key: string): UseLocalStorageReturnType => {
   );
 
   useEffect(() => {
-    value.current = localStorage.getItem(key) || '';
-  }, [key]);
+    onInit(localStorage.getItem(key) || '');
+  }, [key, onInit]);
 
-  return [value, updateLocalStorageValue];
+  return updateLocalStorageValue;
 };
 
 export default useLocalStorage;
