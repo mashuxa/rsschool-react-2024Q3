@@ -35,6 +35,7 @@ const SearchForm: FC<SearchFormProps> = ({ onSuccess }) => {
       const results = await fetcher<FetchDataType<Person>>(`?${searchParams.toString()}`).catch(() => DEFAULT_RESULT);
 
       setIsLoading(false);
+
       onSuccess(results);
     },
     [onSuccess],

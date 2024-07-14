@@ -14,7 +14,7 @@ const PersonCardList: FC<PersonCardListProps> = ({ data }) => {
       ))}
     </div>
   ) : (
-    <i>No data</i>
+    <i data-testid="no-data">No data</i>
   );
 };
 

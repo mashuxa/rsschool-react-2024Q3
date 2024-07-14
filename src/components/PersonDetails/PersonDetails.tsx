@@ -9,35 +9,37 @@ const PersonDetails: FC = () => {
   const { state } = useNavigation();
 
   return (
-    <div className="max-w-80 m-auto">
-      <NavLink className="block border p-4 mb-4 bg-white hover:bg-blue-50" to={'/'}>
+    <div data-testid="detailed-card" className="max-w-80 m-auto">
+      <NavLink data-testid="details-card-close" className="block border p-4 mb-4 bg-white hover:bg-blue-50" to={'/'}>
         ✖ close
       </NavLink>
       {state === 'loading' ? (
         <Preloader />
       ) : (
         <div className="card p-4 bg-gray-50 border-gray-300 rounded-md shadow-md">
-          <h3 className="text-xl font-semibold py-4">{name}</h3>
+          <h3 data-testid="detailed-card-name" className="text-xl font-semibold py-4">
+            {name}
+          </h3>
           <div className="text-sm text-gray-700">
-            <p>
+            <p data-testid="detailed-card-height">
               <strong>Height:</strong> {height} cm
             </p>
-            <p>
+            <p data-testid="detailed-card-mass">
               <strong>Mass:</strong> {mass} kg
             </p>
-            <p>
+            <p data-testid="detailed-card-hair">
               <strong>Hair Color:</strong> {hair_color}
             </p>
-            <p>
+            <p data-testid="detailed-card-skin">
               <strong>Skin Color:</strong> {skin_color}
             </p>
-            <p>
+            <p data-testid="detailed-card-eye">
               <strong>Eye Color:</strong> {eye_color}
             </p>
-            <p>
+            <p data-testid="detailed-card-year">
               <strong>Birth Year:</strong> {birth_year}
             </p>
-            <p>
+            <p data-testid="detailed-card-gender">
               <strong>Gender:</strong> {gender}
             </p>
           </div>

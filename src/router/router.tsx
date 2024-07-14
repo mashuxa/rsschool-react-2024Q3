@@ -4,7 +4,7 @@ import PersonDetails from '../components/PersonDetails/PersonDetails.tsx';
 import personDataLoader from '../components/PersonDetails/loader.ts';
 import ErrorPage from '../pages/ErrorPage/ErrorPage.tsx';
 
-const router = createBrowserRouter([
+export const routes = [
   {
     path: '/',
     element: <Home />,
@@ -17,6 +17,8 @@ const router = createBrowserRouter([
       },
     ],
   },
-]);
+];
+
+const router = createBrowserRouter(routes);
 
 export default router;

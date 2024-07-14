@@ -9,10 +9,16 @@ const PersonCard: FC<Person> = ({ name, url }) => {
 
   return (
     <NavLink
+      data-testid="person-card"
       to={params.id === id ? `/?${searchParams.toString()}` : `/detail/${id}?${searchParams.toString()}`}
       className="text-xl font-semibold mb-2"
     >
-      <div className="result-item card p-4 mb-4 bg-gray-50 border-gray-300 rounded-md shadow-md">{name}</div>
+      <div
+        data-testid="person-card-header"
+        className="result-item card p-4 mb-4 bg-gray-50 border-gray-300 rounded-md shadow-md"
+      >
+        {name}
+      </div>
     </NavLink>
   );
 };
