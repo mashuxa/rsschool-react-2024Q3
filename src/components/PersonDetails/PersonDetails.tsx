@@ -1,19 +1,19 @@
 import { FC } from 'react';
-import { NavLink, useLoaderData, useNavigation } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import Preloader from '../Preloader/Preloader.tsx';
-import { Person } from '../../types.ts';
+import api from '../../api/api.ts';
 
 const PersonDetails: FC = () => {
-  const { details } = useLoaderData() as { details: Person };
-  const { name, height, mass, hair_color, skin_color, eye_color, birth_year, gender } = details;
-  const { state } = useNavigation();
+  const { id = '' } = useParams();
+  const { isLoading, data } = api.useGetPersonQuery(id.toString());
+  const { name, height, mass, hair_color, skin_color, eye_color, birth_year, gender } = data || {};
 
   return (
     <div data-testid="detailed-card" className="max-w-80 m-auto">
       <NavLink data-testid="details-card-close" className="block border p-4 mb-4 bg-white hover:bg-blue-50" to={'/'}>
         ✖ close
       </NavLink>
-      {state === 'loading' ? (
+      {isLoading ? (
         <Preloader />
       ) : (
         <div className="card p-4 bg-gray-50 border-gray-300 rounded-md shadow-md">

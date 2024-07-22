@@ -1,45 +1,20 @@
-import { FormEvent, FC, useState, useCallback, useEffect, useRef } from 'react';
-import { fetcher } from '../../api/fetcher';
+import { FormEvent, FC, useState, useCallback, useRef, useMemo } from 'react';
 import useLocalStorage from '../../hooks/useLocalStorage/useLocalStorage.ts';
-import { FetchDataType, Person } from '../../types.ts';
 import Preloader from '../Preloader/Preloader.tsx';
 import { useSearchParams } from 'react-router-dom';
 import { DEFAULT_PAGE } from '../Pagination/Pagination.tsx';
+import api from '../../api/api.ts';
 
 export const SEARCH_STORAGE_KEY = 'search';
-const DEFAULT_RESULT = {
-  results: [],
-  count: 0,
-};
-interface SearchFormProps {
-  onSuccess: (data: FetchDataType<Person>) => void;
-}
 
-const SearchForm: FC<SearchFormProps> = ({ onSuccess }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
+const SearchForm: FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams({ page: DEFAULT_PAGE });
   const [search, setSearch] = useState<string | null>(null);
   const updateLocalStorage = useLocalStorage(SEARCH_STORAGE_KEY, setSearch);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const searchParam = useMemo(() => (search ? `&search=${search}` : ''), [search]);
+  const { isLoading } = api.useGetPersonsQuery(`?${searchParams.toString()}${searchParam}`);
 
-  const fetchData = useCallback(
-    async (searchValue: string, page: string) => {
-      const searchParams = new URLSearchParams([['page', page]]);
-
-      if (searchValue) {
-        searchParams.set('search', searchValue);
-      }
-
-      setIsLoading(true);
-
-      const results = await fetcher<FetchDataType<Person>>(`?${searchParams.toString()}`).catch(() => DEFAULT_RESULT);
-
-      setIsLoading(false);
-
-      onSuccess(results);
-    },
-    [onSuccess],
-  );
   const handleSubmit = useCallback(
     (event: FormEvent) => {
       event.preventDefault();
@@ -52,18 +27,6 @@ const SearchForm: FC<SearchFormProps> = ({ onSuccess }) => {
     },
     [setSearchParams, updateLocalStorage],
   );
-
-  useEffect(() => {
-    if (!searchParams.get('page')) {
-      setSearchParams((prev) => `${prev.toString()}&page=${DEFAULT_PAGE}`);
-    }
-  }, [searchParams, setSearchParams]);
-
-  useEffect(() => {
-    if (search !== null) {
-      void fetchData(search, searchParams.get('page') || DEFAULT_PAGE);
-    }
-  }, [fetchData, search, searchParams]);
 
   return (
     <div>

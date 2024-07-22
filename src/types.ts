@@ -20,4 +20,6 @@ export interface Person {
 export interface FetchDataType<T> {
   results: T[];
   count: number;
+  previous: string;
+  next: string;
 }

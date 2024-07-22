@@ -1,11 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
-import { fetcher } from '../../api/fetcher';
 import mockData from '../../__mocks__/persons.ts';
 import { routes } from '../../router/router.tsx';
 import { act } from 'react';
-
-jest.mock('../../api/fetcher');
+import { store } from '../../store/store.ts';
+import { Provider } from 'react-redux';
+import fetch from 'jest-fetch-mock';
 
 const router = createMemoryRouter(routes, {
   initialEntries: ['/'],
@@ -15,12 +15,14 @@ describe('Home Page', () => {
   let links: HTMLElement[];
 
   beforeEach(async () => {
-    (fetcher as jest.Mock).mockImplementation((url: string) => {
-      return Promise.resolve(url.startsWith('?') ? { results: mockData, count: mockData.length } : mockData[0]);
-    });
+    fetch.mockResponse(JSON.stringify({ results: mockData, count: mockData.length }));
 
     await act(async () => {
-      render(<RouterProvider router={router} />);
+      render(
+        <Provider store={store}>
+          <RouterProvider router={router} />
+        </Provider>,
+      );
     });
 
     links = await screen.findAllByTestId('person-card');
@@ -41,7 +43,9 @@ describe('Home Page', () => {
       fireEvent.click(links[1]);
     });
 
-    expect(fetcher).toHaveBeenNthCalledWith(2, '4');
+    const call = fetch.mock.calls[0][0] as Request;
+
+    expect(call.url).toEqual('https://swapi.dev/api/people/4');
   });
 
   test('should close detailed card on clicking close button', async () => {

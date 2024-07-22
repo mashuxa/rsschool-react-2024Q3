@@ -1,18 +1,19 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import SearchForm from '../SearchForm/SearchForm.tsx';
 import Pagination from '../Pagination/Pagination.tsx';
-import { FetchDataType, Person } from '../../types.ts';
 import PersonCardList from '../PersonCardList/PersonCardList.tsx';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store.ts';
 
 const Sidebar: FC = () => {
-  const [data, setData] = useState<FetchDataType<Person>>({ count: 0, results: [] });
+  const { results, count } = useSelector((state: RootState) => state.persons.currentPage);
 
   return (
     <>
-      <SearchForm onSuccess={setData} />
+      <SearchForm />
       <div className="transition hover:bg-blue-50">
-        {!!data.count && <Pagination totalCount={data.count} />}
-        <PersonCardList data={data.results} />
+        {!!count && <Pagination totalCount={count} />}
+        <PersonCardList data={results} />
       </div>
     </>
   );
