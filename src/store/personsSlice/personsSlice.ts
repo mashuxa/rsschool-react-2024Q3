@@ -19,8 +19,6 @@ const initialState: PersonsState = {
   currentPage: {
     results: [],
     count: 0,
-    previous: '',
-    next: '',
     isLoading: false,
     error: null,
   },
@@ -31,6 +29,10 @@ const personsSlice = createSlice({
   name: 'persons',
   initialState,
   reducers: {
+    updateCurrentPageData: (state, action: { payload: FetchDataType<Person>; type: string }) => {
+      state.currentPage.results = normalizePersons(action.payload.results);
+      state.currentPage.count = action.payload.count;
+    },
     toggle: (state, action: { payload: Person; type: string }) => {
       const item = action.payload;
 
@@ -50,13 +52,9 @@ const personsSlice = createSlice({
         state.currentPage.isLoading = true;
         state.currentPage.error = null;
       })
-      .addMatcher(api.endpoints.getPersons.matchFulfilled, (state, action) => {
-        state.currentPage = {
-          ...action.payload,
-          isLoading: false,
-          error: null,
-          results: normalizePersons(action.payload.results),
-        };
+      .addMatcher(api.endpoints.getPersons.matchFulfilled, (state) => {
+        state.currentPage.isLoading = false;
+        state.currentPage.error = null;
       })
       .addMatcher(api.endpoints.getPersons.matchRejected, (state, action) => {
         state.currentPage.isLoading = false;
@@ -65,6 +63,6 @@ const personsSlice = createSlice({
   },
 });
 
-export const { toggle, clearSelected } = personsSlice.actions;
+export const { toggle, clearSelected, updateCurrentPageData } = personsSlice.actions;
 
 export default personsSlice.reducer;

@@ -1,19 +1,24 @@
-import { FormEvent, FC, useState, useCallback, useRef, useMemo } from 'react';
+import { FormEvent, FC, useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import useLocalStorage from '../../hooks/useLocalStorage/useLocalStorage.ts';
 import Preloader from '../Preloader/Preloader.tsx';
 import { useSearchParams } from 'react-router-dom';
 import { DEFAULT_PAGE } from '../Pagination/Pagination.tsx';
 import api from '../../api/api.ts';
+import { clearSelected, updateCurrentPageData } from '../../store/personsSlice/personsSlice.ts';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../store/store.ts';
 
 export const SEARCH_STORAGE_KEY = 'search';
 
 const SearchForm: FC = () => {
+  const { isLoading } = useSelector((state: RootState) => state.persons.currentPage);
+  const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams({ page: DEFAULT_PAGE });
   const [search, setSearch] = useState<string | null>(null);
   const updateLocalStorage = useLocalStorage(SEARCH_STORAGE_KEY, setSearch);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchParam = useMemo(() => (search ? `&search=${search}` : ''), [search]);
-  const { isLoading } = api.useGetPersonsQuery(`?${searchParams.toString()}${searchParam}`);
+  const { data } = api.useGetPersonsQuery(`?${searchParams.toString()}${searchParam}`);
 
   const handleSubmit = useCallback(
     (event: FormEvent) => {
@@ -23,10 +28,17 @@ const SearchForm: FC = () => {
         updateLocalStorage(inputRef.current.value);
         setSearchParams({ page: DEFAULT_PAGE });
         setSearch(inputRef.current.value);
+        dispatch(clearSelected());
       }
     },
-    [setSearchParams, updateLocalStorage],
+    [dispatch, setSearchParams, updateLocalStorage],
   );
+
+  useEffect(() => {
+    if (data) {
+      dispatch(updateCurrentPageData(data));
+    }
+  }, [data, dispatch]);
 
   return (
     <div>
@@ -40,7 +52,7 @@ const SearchForm: FC = () => {
           ref={inputRef}
           type="text"
           placeholder="Search..."
-          className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-slate-800"
         />
         <button
           data-testid="search-form-submit"
