@@ -30,8 +30,12 @@ const SearchForm: FC = () => {
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="flex flex-col card space-y-4 p-6 rounded-lg shadow-sm bg-white">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col card space-y-4 p-6 rounded-lg shadow-sm bg-white dark:bg-gray-600 dark:text-slate-50"
+      >
         <input
+          data-testid="search-form-input"
           defaultValue={search || ''}
           ref={inputRef}
           type="text"
@@ -39,6 +43,7 @@ const SearchForm: FC = () => {
           className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
+          data-testid="search-form-submit"
           type="submit"
           className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           disabled={isLoading}

@@ -31,7 +31,7 @@ const PersonCard: FC<PersonCardProps> = ({ isSelected, ...data }) => {
       >
         <div
           data-testid="person-card-header"
-          className="result-item card p-4 bg-gray-50 border-gray-300 rounded-md shadow-md"
+          className="result-item card p-4 bg-gray-50 dark:bg-gray-600 dark:text-slate-50 border-gray-300 rounded-md shadow-md"
         >
           {data.name}
         </div>

@@ -12,7 +12,7 @@ const Sidebar: FC = () => {
   return (
     <>
       <SearchForm />
-      <div className="transition hover:bg-blue-50">
+      <div>
         {!!count && <Pagination totalCount={count} />}
         <PersonCardList data={results} />
         <SelectionMenu />
