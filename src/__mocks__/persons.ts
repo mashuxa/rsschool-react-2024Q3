@@ -2,6 +2,7 @@ import { Person } from '../types.ts';
 
 const mockData: Person[] = [
   {
+    id: '1',
     name: 'Luke Skywalker',
     height: '172',
     mass: '77',
@@ -25,6 +26,7 @@ const mockData: Person[] = [
     url: 'https://swapi.dev/api/people/1/',
   },
   {
+    id: '4',
     name: 'Darth Vader',
     height: '202',
     mass: '136',
@@ -48,6 +50,7 @@ const mockData: Person[] = [
     url: 'https://swapi.dev/api/people/4/',
   },
   {
+    id: '5',
     name: 'Leia Organa',
     height: '150',
     mass: '49',

@@ -3,13 +3,17 @@ import PersonCardList from './PersonCardList';
 import { BrowserRouter } from 'react-router-dom';
 import mockData from '../../__mocks__/persons.ts';
 import { Person } from '../../types.ts';
+import { Provider } from 'react-redux';
+import { store } from '../../store/store.ts';
 
 describe('PersonCardList', () => {
   const renderComponent = (data: Person[]) => {
     render(
-      <BrowserRouter>
-        <PersonCardList data={data} />
-      </BrowserRouter>,
+      <Provider store={store}>
+        <BrowserRouter>
+          <PersonCardList data={data} />
+        </BrowserRouter>
+      </Provider>,
     );
   };
 

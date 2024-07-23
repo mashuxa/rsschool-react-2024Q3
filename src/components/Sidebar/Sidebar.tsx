@@ -4,6 +4,7 @@ import Pagination from '../Pagination/Pagination.tsx';
 import PersonCardList from '../PersonCardList/PersonCardList.tsx';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store.ts';
+import SelectionMenu from '../SelectionMenu/SelectionMenu.tsx';
 
 const Sidebar: FC = () => {
   const { results, count } = useSelector((state: RootState) => state.persons.currentPage);
@@ -14,6 +15,7 @@ const Sidebar: FC = () => {
       <div className="transition hover:bg-blue-50">
         {!!count && <Pagination totalCount={count} />}
         <PersonCardList data={results} />
+        <SelectionMenu />
       </div>
     </>
   );

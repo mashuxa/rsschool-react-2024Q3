@@ -8,11 +8,7 @@ describe('Pagination Component', () => {
     ...jest.requireActual('react-router-dom'),
     useSearchParams: jest.fn(),
   }));
-  let useSearchParamsSpy: jest.SpyInstance;
-
-  beforeEach(() => {
-    useSearchParamsSpy = jest.spyOn(router, 'useSearchParams');
-  });
+  const useSearchParamsSpy: jest.SpyInstance = jest.spyOn(router, 'useSearchParams');
 
   it('should updates URL query parameter when page changes', async () => {
     const setParams = jest.fn();
@@ -25,6 +21,7 @@ describe('Pagination Component', () => {
     await act(async () => {
       fireEvent.click(page2Button);
     });
+
     expect(setParams).toHaveBeenCalledWith({ page: '2' });
   });
 });

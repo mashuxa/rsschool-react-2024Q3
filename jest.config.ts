@@ -9,7 +9,7 @@ const config: Config = {
   setupFilesAfterEnv: ['./src/setupTests.ts'],
   clearMocks: true,
   collectCoverage: true,
-  collectCoverageFrom: ['./src/**/*.{js,jsx,ts,tsx}'],
+  collectCoverageFrom: ['./src/**/*.{js,jsx,ts,tsx}', '!./src/main.tsx', '!./src/store/hooks.ts'],
   coverageDirectory: 'coverage',
   testEnvironment: 'jsdom',
   coverageThreshold: {
