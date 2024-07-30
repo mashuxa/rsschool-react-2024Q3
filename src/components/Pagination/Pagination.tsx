@@ -1,33 +1,28 @@
-import { FC, useEffect, useMemo, useState } from 'react';
-import PaginationItem from './PaginationItem/PaginationItem.tsx';
-import { useSearchParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store.ts';
+import { FC, useContext, useEffect, useMemo, useState } from "react";
+import PaginationItem from "src/components/Pagination/PaginationItem/PaginationItem";
+import { useRouter } from "next/router";
+import { DataContext } from "src/providers/DataProvider/DataProvider";
 
-export const DEFAULT_PAGE = '1';
+export const DEFAULT_PAGE = "1";
 const PER_PAGE = 10;
 
 const Pagination: FC = () => {
-  const { count } = useSelector((state: RootState) => state.persons.currentPage);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { persons } = useContext(DataContext);
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE);
-  const pages = useMemo(() => new Array<null>(Math.ceil(count / PER_PAGE)).fill(null), [count]);
+
+  const pages = useMemo(
+    () => new Array<null>(Math.ceil(persons.count / PER_PAGE)).fill(null),
+    [persons.count],
+  );
 
   useEffect(() => {
-    const page = searchParams.get('page');
+    const page = router.query.page as string;
 
     if (page) {
       setCurrentPage(page);
     }
-  }, [searchParams]);
-
-  useEffect(() => {
-    const page = searchParams.get('page');
-
-    if (!page) {
-      setSearchParams({ page: DEFAULT_PAGE });
-    }
-  }, [searchParams, setSearchParams]);
+  }, [router.query.page]);
 
   return (
     <div className="text-center p-4">

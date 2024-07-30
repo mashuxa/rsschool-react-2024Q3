@@ -1,14 +1,11 @@
-import { configureStore } from '@reduxjs/toolkit';
-import api from '../api/api.ts';
-import personsReducer from './personsSlice/personsSlice.ts';
+import { configureStore } from "@reduxjs/toolkit";
+import personsReducer from "./personsSlice/personsSlice";
 
 export const createStore = (preloadedState = {}) =>
   configureStore({
     reducer: {
-      [api.reducerPath]: api.reducer,
       persons: personsReducer,
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.middleware),
     preloadedState,
   });
 

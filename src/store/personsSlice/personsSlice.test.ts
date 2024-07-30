@@ -1,9 +1,13 @@
-import personsReducer, { toggle, clearSelected, PersonsState } from './personsSlice';
+import personsReducer, {
+  toggle,
+  clearSelected,
+  PersonsState,
+} from "./personsSlice";
 
-import { configureStore } from '@reduxjs/toolkit';
-import mockData from '../../__mocks__/persons.ts';
+import { configureStore } from "@reduxjs/toolkit";
+import mockData from "../../__mocks__/persons";
 
-describe('Redux: Person Slice', () => {
+describe("Redux: Person Slice", () => {
   let store: ReturnType<typeof configureStore>;
   const getSelectedPersons = () => {
     const state = store.getState() as { persons: PersonsState };
@@ -15,7 +19,7 @@ describe('Redux: Person Slice', () => {
     store = configureStore({ reducer: { persons: personsReducer } });
   });
 
-  it('Toggle action: should toggle selected person in store on toggle action', () => {
+  it("Toggle action: should toggle selected person in store on toggle action", () => {
     const person = mockData[0];
 
     expect(getSelectedPersons()).toEqual({});
@@ -27,7 +31,7 @@ describe('Redux: Person Slice', () => {
     expect(getSelectedPersons()).toEqual({});
   });
 
-  it('ClearSelected action: should unselect all persons on clearSelected action', () => {
+  it("ClearSelected action: should unselect all persons on clearSelected action", () => {
     const person1 = mockData[0];
     const person2 = mockData[1];
 
@@ -36,7 +40,10 @@ describe('Redux: Person Slice', () => {
     store.dispatch(toggle(person1));
     store.dispatch(toggle(person2));
 
-    expect(getSelectedPersons()).toEqual({ [person1.id]: person1, [person2.id]: person2 });
+    expect(getSelectedPersons()).toEqual({
+      [person1.id]: person1,
+      [person2.id]: person2,
+    });
 
     store.dispatch(clearSelected());
 

@@ -1,23 +1,36 @@
-import { FC } from 'react';
-import { NavLink, useParams } from 'react-router-dom';
-import Preloader from '../Preloader/Preloader.tsx';
-import api from '../../api/api.ts';
+import { FC, useContext } from "react";
+import Link from "next/link";
+import { DataContext } from "src/providers/DataProvider/DataProvider";
 
 const PersonDetails: FC = () => {
-  const { id = '' } = useParams();
-  const { isLoading, data } = api.useGetPersonQuery(id.toString());
-  const { name, height, mass, hair_color, skin_color, eye_color, birth_year, gender } = data || {};
+  const { details } = useContext(DataContext);
+
+  const {
+    name,
+    height,
+    mass,
+    hair_color,
+    skin_color,
+    eye_color,
+    birth_year,
+    gender,
+  } = details;
 
   return (
     <div data-testid="detailed-card" className="max-w-80 m-auto">
-      <NavLink data-testid="details-card-close" className="block border p-4 mb-4 bg-white hover:bg-blue-50" to={'/'}>
+      <Link
+        data-testid="details-card-close"
+        className="block border p-4 mb-4 bg-white hover:bg-blue-50"
+        href={"/"}
+      >
         ✖ close
-      </NavLink>
-      {isLoading ? (
-        <Preloader />
-      ) : (
+      </Link>
+      {
         <div className="card p-4 bg-gray-50 border-gray-300 rounded-md shadow-md">
-          <h3 data-testid="detailed-card-name" className="text-xl font-semibold py-4">
+          <h3
+            data-testid="detailed-card-name"
+            className="text-xl font-semibold py-4"
+          >
             {name}
           </h3>
           <div className="text-sm text-gray-700">
@@ -44,7 +57,7 @@ const PersonDetails: FC = () => {
             </p>
           </div>
         </div>
-      )}
+      }
     </div>
   );
 };

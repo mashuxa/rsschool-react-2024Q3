@@ -1,40 +1,37 @@
-import { render, fireEvent } from '@testing-library/react';
-import Pagination from './Pagination';
-import * as router from 'react-router-dom';
-import { act } from 'react';
-import { Provider } from 'react-redux';
-import { createStore } from '../../store/store.ts';
-import mockData from '../../__mocks__/persons.ts';
+import { render, fireEvent } from "@testing-library/react";
+import Pagination from "./Pagination";
+import { act } from "react";
+import { Provider } from "react-redux";
+import { createStore } from "src/store/store";
+import mockData from "src/__mocks__/persons";
+import mockRouter from "src/__mocks__/mockRouter";
+import { DataProvider } from "src/providers/DataProvider/DataProvider";
 
-describe('Pagination Component', () => {
-  jest.mock('react-router-dom', () => ({
-    ...jest.requireActual('react-router-dom'),
-    useSearchParams: jest.fn(),
-  }));
-  const useSearchParamsSpy: jest.SpyInstance = jest.spyOn(router, 'useSearchParams');
+describe("Pagination Component", () => {
+  const routerPushMock = mockRouter({ page: 1 }, "test");
   const mockStore = createStore({
     persons: {
-      currentPage: { results: mockData, count: 20 },
       selectedPersons: {},
     },
   });
 
-  it('should updates URL query parameter when page changes', async () => {
-    const setParams = jest.fn();
-
-    useSearchParamsSpy.mockReturnValue([new URLSearchParams(), setParams]);
-
+  it("should updates URL query parameter when page changes", async () => {
     const { getByText } = render(
       <Provider store={mockStore}>
-        <Pagination />
+        <DataProvider details={{}} persons={{ count: 82, results: mockData }}>
+          <Pagination />
+        </DataProvider>
       </Provider>,
     );
-    const page2Button = getByText('2');
+    const page2Button = getByText("2");
 
     await act(async () => {
       fireEvent.click(page2Button);
     });
 
-    expect(setParams).toHaveBeenCalledWith({ page: '2' });
+    expect(routerPushMock).toHaveBeenCalledWith({
+      pathname: "test",
+      query: { page: "2" },
+    });
   });
 });

@@ -1,8 +1,11 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect } from "react";
 
 type UseLocalStorageReturnType = (value: string) => void;
 
-const useLocalStorage = (key: string, onInit: (value: string) => void): UseLocalStorageReturnType => {
+const useLocalStorage = (
+  key: string,
+  onInit: (value: string) => void,
+): UseLocalStorageReturnType => {
   const updateLocalStorageValue = useCallback(
     (newValue: string): void => {
       localStorage.setItem(key, newValue);
@@ -11,7 +14,7 @@ const useLocalStorage = (key: string, onInit: (value: string) => void): UseLocal
   );
 
   useEffect(() => {
-    onInit(localStorage.getItem(key) || '');
+    onInit(localStorage.getItem(key) || "");
   }, [key, onInit]);
 
   return updateLocalStorageValue;
