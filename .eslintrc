@@ -5,6 +5,7 @@
     "es2020": true
   },
   "extends": [
+    "next/core-web-vitals",
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:react-hooks/recommended",
@@ -23,19 +24,14 @@
     }
   },
   "rules": {
-    "react-refresh/only-export-components": [
-      "warn",
-      {
-        "allowConstantExport": true
-      }
-    ],
+    "react-refresh/only-export-components": "off",
     "@typescript-eslint/no-explicit-any": "error",
     "react-compiler/react-compiler": "error",
     "prettier/prettier": "error"
   },
   "overrides": [
     {
-      "files": ["**/*.test.tsx", "**/*.test.ts"],
+      "files": ["**/*.test.tsx", "**/*.test.ts", "**/setupTests.ts"],
       "rules": {
         "@typescript-eslint/no-unsafe-assignment": "off",
         "@typescript-eslint/no-unsafe-return": "off",

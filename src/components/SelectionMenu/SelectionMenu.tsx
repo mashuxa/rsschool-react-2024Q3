@@ -1,14 +1,17 @@
-import { FC, useCallback, useMemo, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { clearSelected } from '../../store/personsSlice/personsSlice.ts';
-import { RootState } from '../../store/store.ts';
-import { generateCsvBlob } from '../../utils/utils.ts';
-import { Link } from 'react-router-dom';
+import { FC, useCallback, useMemo, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { clearSelected } from "src/store/personsSlice/personsSlice";
+import { RootState } from "src/store/store";
+import { generateCsvBlob } from "src/utils/utils";
+import Link from "next/link";
 
 const SelectionMenu: FC = () => {
   const dispatch = useDispatch();
   const { selectedPersons } = useSelector(({ persons }: RootState) => persons);
-  const selectedData = useMemo(() => Object.values(selectedPersons), [selectedPersons]);
+  const selectedData = useMemo(
+    () => Object.values(selectedPersons),
+    [selectedPersons],
+  );
   const downloadLinkRef = useRef<HTMLAnchorElement>(null);
 
   const handleUnselectAll = useCallback(() => {
@@ -22,7 +25,7 @@ const SelectionMenu: FC = () => {
         downloadLinkRef.current.href = URL.createObjectURL(blob);
       }
     } catch (err) {
-      console.error('Error generating CSV:', err);
+      console.error("Error generating CSV:", err);
     }
   }, [selectedData]);
 
@@ -32,7 +35,9 @@ const SelectionMenu: FC = () => {
         data-testid="selection-menu"
         className="fixed bottom-0 left-0 right-0 p-4 border bg-blue-50 flex justify-between items-center"
       >
-        <div data-testid="selection-menu-count">{selectedData.length} items are selected</div>
+        <div data-testid="selection-menu-count">
+          {selectedData.length} items are selected
+        </div>
         <div>
           <button
             data-testid="selection-menu-unselect-all"
@@ -44,7 +49,7 @@ const SelectionMenu: FC = () => {
           <Link
             data-testid="selection-menu-download"
             ref={downloadLinkRef}
-            to=""
+            href=""
             target="_blank"
             download={`${selectedData.length}_people.csv`}
             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"

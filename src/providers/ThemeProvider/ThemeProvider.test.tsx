@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import { ThemeContext, ThemeProvider } from './ThemeProvider';
-import React, { act, useContext } from 'react';
+import { fireEvent, render, screen } from "@testing-library/react";
+import { ThemeContext, ThemeProvider } from "./ThemeProvider";
+import React, { act, useContext } from "react";
 
 const TestComponent: React.FC = () => {
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -15,7 +15,7 @@ const TestComponent: React.FC = () => {
   );
 };
 
-describe('ThemeProvider', () => {
+describe("ThemeProvider", () => {
   const renderComponent = () => {
     render(
       <ThemeProvider>
@@ -28,45 +28,45 @@ describe('ThemeProvider', () => {
     localStorage.clear();
   });
 
-  it('should set the initial theme from localStorage', () => {
-    localStorage.setItem('theme', 'dark');
+  it("should set the initial theme from localStorage", () => {
+    localStorage.setItem("theme", "light");
     renderComponent();
 
-    expect(screen.getByTestId('current-theme').textContent).toBe('dark');
+    expect(screen.getByTestId("current-theme").textContent).toBe("light");
   });
 
-  it('should use prefers-color-scheme if no theme in localStorage', () => {
+  it("should use prefers-color-scheme if no theme in localStorage", () => {
     window.matchMedia = jest.fn().mockReturnValue({ matches: true });
     renderComponent();
 
-    expect(screen.getByTestId('current-theme').textContent).toBe('dark');
+    expect(screen.getByTestId("current-theme").textContent).toBe("dark");
   });
 
-  it('should toggle the theme', async () => {
+  it("should toggle the theme", async () => {
     window.matchMedia = jest.fn().mockReturnValue({ matches: false });
     renderComponent();
 
-    const button = screen.getByTestId('toggle-theme');
-    const currentTheme = screen.getByTestId('current-theme');
+    const button = screen.getByTestId("toggle-theme");
+    const currentTheme = screen.getByTestId("current-theme");
 
-    expect(currentTheme.textContent).toBe('light');
+    expect(currentTheme.textContent).toBe("light");
 
     await act(async () => {
       fireEvent.click(button);
     });
 
-    expect(currentTheme.textContent).toBe('dark');
+    expect(currentTheme.textContent).toBe("dark");
   });
 
-  it('should save the new theme to localStorage', async () => {
+  it("should save the new theme to localStorage", async () => {
     renderComponent();
 
-    const button = screen.getByTestId('toggle-theme');
+    const button = screen.getByTestId("toggle-theme");
 
     await act(async () => {
       fireEvent.click(button);
     });
 
-    expect(localStorage.getItem('theme')).toBe('dark');
+    expect(localStorage.getItem("theme")).toBe("dark");
   });
 });

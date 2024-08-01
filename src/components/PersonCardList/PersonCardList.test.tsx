@@ -1,38 +1,42 @@
-import { render, screen } from '@testing-library/react';
-import PersonCardList from './PersonCardList';
-import { BrowserRouter } from 'react-router-dom';
-import mockData from '../../__mocks__/persons.ts';
-import { Provider } from 'react-redux';
-import { createStore } from '../../store/store.ts';
-import { Person } from '../../types.ts';
+import { render, screen } from "@testing-library/react";
+import PersonCardList from "./PersonCardList";
+import mockData from "src/__mocks__/persons";
+import { Provider } from "react-redux";
+import { createStore } from "src/store/store";
+import { Person } from "src/types";
+import mockRouter from "src/__mocks__/mockRouter";
+import { DataProvider } from "../../providers/DataProvider/DataProvider";
 
-describe('PersonCardList', () => {
+describe("PersonCardList", () => {
   const renderComponent = (results: Person[], count: number) => {
     const mockStore = createStore({
       persons: {
-        currentPage: { results, count },
         selectedPersons: {},
       },
     });
 
     render(
       <Provider store={mockStore}>
-        <BrowserRouter>
+        <DataProvider details={{}} persons={{ count, results }}>
           <PersonCardList />
-        </BrowserRouter>
+        </DataProvider>
       </Provider>,
     );
   };
 
-  test('should render the specified number of PersonCard components', () => {
+  beforeAll(() => {
+    mockRouter({});
+  });
+
+  test("should render the specified number of PersonCard components", () => {
     renderComponent(mockData, mockData.length);
 
-    expect(screen.getAllByTestId('person-card')).toHaveLength(mockData.length);
+    expect(screen.getAllByTestId("person-card")).toHaveLength(mockData.length);
   });
 
   test('should display "No data" message when no data is present', () => {
     renderComponent([], 0);
 
-    expect(screen.getByTestId('no-data')).toHaveTextContent('No data');
+    expect(screen.getByTestId("no-data")).toHaveTextContent("No data");
   });
 });

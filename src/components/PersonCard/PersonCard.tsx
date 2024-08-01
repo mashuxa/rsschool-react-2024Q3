@@ -1,8 +1,9 @@
-import { FC, useCallback } from 'react';
-import { Person } from '../../types.ts';
-import { NavLink, useParams, useSearchParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { toggle } from '../../store/personsSlice/personsSlice.ts';
+import { FC, useCallback, useMemo } from "react";
+import { Person } from "src/types";
+import { useDispatch } from "react-redux";
+import { toggle } from "src/store/personsSlice/personsSlice";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 interface PersonCardProps extends Person {
   isSelected: boolean;
@@ -10,8 +11,15 @@ interface PersonCardProps extends Person {
 
 const PersonCard: FC<PersonCardProps> = ({ isSelected, ...data }) => {
   const dispatch = useDispatch();
-  const params = useParams();
-  const [searchParams] = useSearchParams();
+  const router = useRouter();
+  const personId = useMemo(
+    () => (router.query.id || "") as string,
+    [router.query.id],
+  );
+  const page = useMemo(
+    () => (router.query.page || "") as string,
+    [router.query.page],
+  );
   const handleCheckbox = useCallback(() => {
     dispatch(toggle(data));
   }, [data, dispatch]);
@@ -24,9 +32,13 @@ const PersonCard: FC<PersonCardProps> = ({ isSelected, ...data }) => {
         type="checkbox"
         onChange={handleCheckbox}
       />
-      <NavLink
+      <Link
         data-testid="person-card"
-        to={params.id === data.id ? `/?${searchParams.toString()}` : `/detail/${data.id}?${searchParams.toString()}`}
+        href={
+          personId === data.id
+            ? `/?page=${page}`
+            : `/detail/${data.id}?page=${page}`
+        }
         className="text-xl font-semibold"
       >
         <div
@@ -35,7 +47,7 @@ const PersonCard: FC<PersonCardProps> = ({ isSelected, ...data }) => {
         >
           {data.name}
         </div>
-      </NavLink>
+      </Link>
     </div>
   );
 };

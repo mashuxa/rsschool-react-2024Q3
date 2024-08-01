@@ -1,5 +1,5 @@
-import { FC, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { FC, useCallback } from "react";
+import { useRouter } from "next/router";
 
 interface PaginationItemProps {
   page: string;
@@ -8,15 +8,18 @@ interface PaginationItemProps {
 }
 
 const PaginationItem: FC<PaginationItemProps> = ({ page, isActive }) => {
-  const [, setSearchParams] = useSearchParams();
+  const router = useRouter();
   const handleClick = useCallback(() => {
-    setSearchParams({ page: page.toString() });
-  }, [page, setSearchParams]);
+    void router.push({
+      pathname: router.pathname,
+      query: { ...router.query, page: page.toString() },
+    });
+  }, [page, router]);
 
   return (
     <button
       className={`px-3 py-1 mr-2 rounded-md text-lg font-medium transition-colors duration-200 ${
-        isActive ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-400'
+        isActive ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-400"
       } hover:bg-orange-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2`}
       type="button"
       onClick={handleClick}

@@ -1,8 +1,8 @@
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 
 export enum Theme {
-  light = 'light',
-  dark = 'dark',
+  light = "light",
+  dark = "dark",
 }
 
 export interface ThemeContextType {
