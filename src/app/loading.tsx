@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-const Preloader: FC = () => {
+const Loading: FC = () => {
   return (
     <div
       data-testid="preloader"
@@ -13,4 +13,4 @@ const Preloader: FC = () => {
   );
 };
 
-export default Preloader;
+export default Loading;

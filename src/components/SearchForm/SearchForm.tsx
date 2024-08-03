@@ -1,15 +1,20 @@
+"use client";
+
 import { FormEvent, FC, useState, useCallback, useRef, useEffect } from "react";
 import useLocalStorage from "src/hooks/useLocalStorage/useLocalStorage";
 import { clearSelected } from "src/store/personsSlice/personsSlice";
 import { useDispatch } from "react-redux";
-import { useRouter } from "next/router";
-import { DEFAULT_PAGE } from "../Pagination/Pagination";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { updateSearchParams } from "src/utils/utils";
+import { DEFAULT_PAGE } from "src/api/constatnts";
 
 export const SEARCH_STORAGE_KEY = "search";
 
 const SearchForm: FC = () => {
   const dispatch = useDispatch();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [search, setSearch] = useState<string | null>(null);
   const updateLocalStorage = useLocalStorage(SEARCH_STORAGE_KEY, setSearch);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -29,24 +34,22 @@ const SearchForm: FC = () => {
 
   useEffect(() => {
     if (search !== null) {
-      void router.push({
-        pathname: router.pathname,
-        query: {
-          ...router.query,
-          page: router.query.page || DEFAULT_PAGE,
-          search,
-        },
+      const newParams = updateSearchParams(searchParams, {
+        page: searchParams.get("page") || DEFAULT_PAGE,
+        search,
       });
+
+      router.push(`${pathname}?${newParams}`);
     }
     // eslint-disable-next-line
   }, [search]);
 
   useEffect(() => {
-    const querySearch = (router.query.search as string) || "";
+    const querySearch = searchParams.get("search") || "";
 
     setSearch(querySearch);
     updateLocalStorage(querySearch);
-  }, [router.query.search, updateLocalStorage]);
+  }, [updateLocalStorage, searchParams]);
 
   return (
     <div>

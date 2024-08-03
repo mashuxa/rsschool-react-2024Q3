@@ -1,23 +1,17 @@
-import { FC, useContext } from "react";
+import { Person } from "src/types";
+
+interface PersonCardListProps {
+  persons: Person[];
+}
+
+import { FC } from "react";
 import PersonCard from "src/components/PersonCard/PersonCard";
-import { useSelector } from "react-redux";
-import { RootState } from "src/store/store";
-import { DataContext } from "src/providers/DataProvider/DataProvider";
 
-const PersonCardList: FC = () => {
-  const selectedPersons = useSelector(
-    ({ persons }: RootState) => persons.selectedPersons,
-  );
-  const { persons } = useContext(DataContext);
-
-  return persons?.results.length ? (
+const PersonCardList: FC<PersonCardListProps> = ({ persons }) => {
+  return persons.length ? (
     <div className="space-y-4 pb-16 rounded-md wrapper">
-      {persons.results.map((data, index) => (
-        <PersonCard
-          key={index}
-          {...data}
-          isSelected={!!selectedPersons[data.id]}
-        />
+      {persons.map((data, index) => (
+        <PersonCard key={index} {...data} />
       ))}
     </div>
   ) : (

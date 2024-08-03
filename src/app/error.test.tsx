@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
-import ErrorPage from "src/pages/404";
+import ErrorPage from "src/app/error";
 
-describe("Error provider", () => {
+describe("Error page", () => {
   it("should render error page", () => {
     render(<ErrorPage />);
 

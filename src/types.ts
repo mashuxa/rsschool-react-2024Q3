@@ -22,3 +22,12 @@ export interface FetchDataType<T> {
   results: T[];
   count: number;
 }
+interface SearchParams {
+  page: string;
+  search: string;
+}
+
+export interface NextPageProps {
+  searchParams: SearchParams;
+  params: { id: string };
+}

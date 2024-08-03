@@ -3,27 +3,28 @@ import SearchForm from "./SearchForm";
 import useLocalStorage from "src/hooks/useLocalStorage/useLocalStorage";
 import { store } from "src/store/store";
 import { Provider } from "react-redux";
-import mockData from "src/__mocks__/persons";
-import mockRouter from "src/__mocks__/mockRouter";
-import { DataProvider } from "src/providers/DataProvider/DataProvider";
+import {
+  mockUsePathname,
+  mockUseRouter,
+  mockUseSearchParams,
+} from "src/__mocks__/mockFn";
 
 jest.mock("src/hooks/useLocalStorage/useLocalStorage.ts");
 
 describe("SearchForm", () => {
   const updateLocalStorageMock = jest.fn();
-  const routerPushMock = mockRouter({}, "/detail/[id]");
+  const routerPushMock = mockUseRouter();
 
-  (useLocalStorage as jest.Mock).mockReturnValue(updateLocalStorageMock);
+  beforeAll(() => {
+    (useLocalStorage as jest.Mock).mockReturnValue(updateLocalStorageMock);
+    mockUseSearchParams("1");
+    mockUsePathname("/detail/1");
+  });
 
   it("should call updateLocalStorage callback and setSearchParams on form submit", async () => {
     render(
       <Provider store={store}>
-        <DataProvider
-          persons={{ count: 3, results: mockData }}
-          details={mockData[0]}
-        >
-          <SearchForm />
-        </DataProvider>
+        <SearchForm />
       </Provider>,
     );
 
@@ -36,12 +37,9 @@ describe("SearchForm", () => {
     });
 
     expect(updateLocalStorageMock).toHaveBeenCalledWith("test");
-    expect(routerPushMock).toHaveBeenNthCalledWith(2, {
-      pathname: "/detail/[id]",
-      query: {
-        page: "1",
-        search: "test",
-      },
-    });
+    expect(routerPushMock).toHaveBeenNthCalledWith(
+      2,
+      "/detail/1?page=1&search=test",
+    );
   });
 });

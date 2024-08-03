@@ -1,5 +1,6 @@
 import { FC, useCallback } from "react";
-import { useRouter } from "next/router";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { updateSearchParams } from "src/utils/utils";
 
 interface PaginationItemProps {
   page: string;
@@ -9,12 +10,16 @@ interface PaginationItemProps {
 
 const PaginationItem: FC<PaginationItemProps> = ({ page, isActive }) => {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const handleClick = useCallback(() => {
-    void router.push({
-      pathname: router.pathname,
-      query: { ...router.query, page: page.toString() },
+    const newParams = updateSearchParams(searchParams, {
+      page: page.toString(),
     });
-  }, [page, router]);
+
+    router.push(`${pathname}?${newParams}`);
+  }, [page, pathname, router, searchParams]);
 
   return (
     <button

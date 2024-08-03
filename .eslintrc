@@ -27,7 +27,8 @@
     "react-refresh/only-export-components": "off",
     "@typescript-eslint/no-explicit-any": "error",
     "react-compiler/react-compiler": "error",
-    "prettier/prettier": "error"
+    "prettier/prettier": "error",
+    "react/prop-types": "off"
   },
   "overrides": [
     {

@@ -1,28 +1,34 @@
-import { FC, useContext, useEffect, useMemo, useState } from "react";
-import PaginationItem from "src/components/Pagination/PaginationItem/PaginationItem";
-import { useRouter } from "next/router";
-import { DataContext } from "src/providers/DataProvider/DataProvider";
+"use client";
 
-export const DEFAULT_PAGE = "1";
+import { FC, useEffect, useMemo, useState } from "react";
+import PaginationItem from "src/components/Pagination/PaginationItem/PaginationItem";
+import { useSearchParams } from "next/navigation";
+import { DEFAULT_PAGE } from "src/api/constatnts";
+
+interface PaginationProps {
+  count: number;
+}
+
 const PER_PAGE = 10;
 
-const Pagination: FC = () => {
-  const { persons } = useContext(DataContext);
-  const router = useRouter();
-  const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE);
+const Pagination: FC<PaginationProps> = ({ count }) => {
+  const searchParams = useSearchParams();
+  const [currentPage, setCurrentPage] = useState(
+    () => searchParams.get("page") || DEFAULT_PAGE,
+  );
 
   const pages = useMemo(
-    () => new Array<null>(Math.ceil(persons.count / PER_PAGE)).fill(null),
-    [persons.count],
+    () => new Array<null>(Math.ceil(count / PER_PAGE)).fill(null),
+    [count],
   );
 
   useEffect(() => {
-    const page = router.query.page as string;
+    const page = searchParams.get("page");
 
     if (page) {
       setCurrentPage(page);
     }
-  }, [router.query.page]);
+  }, [searchParams]);
 
   return (
     <div className="text-center p-4">

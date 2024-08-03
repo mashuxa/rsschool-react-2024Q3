@@ -1,23 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import PersonDetails from "src/components/PersonDetails/PersonDetails";
 import mockData from "src/__mocks__/persons";
-import mockRouter from "src/__mocks__/mockRouter";
-import { DataProvider } from "src/providers/DataProvider/DataProvider";
-
-jest.mock("src/hooks/useLoadingStatus/useLoadingStatus");
 
 describe("PersonDetails", () => {
   const renderComponent = () => {
-    render(
-      <DataProvider persons={{ count: 0, results: [] }} details={mockData[0]}>
-        <PersonDetails />
-      </DataProvider>,
-    );
+    render(<PersonDetails data={mockData[0]} />);
   };
-
-  beforeAll(() => {
-    mockRouter({ page: 1 });
-  });
 
   test("should render detailed card component correctly", async () => {
     renderComponent();

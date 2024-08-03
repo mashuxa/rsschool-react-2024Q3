@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useContext } from "react";
 import { Theme, ThemeContextType } from "src/providers/ThemeProvider/types";
 import { ThemeContext } from "src/providers/ThemeProvider/ThemeProvider";
@@ -7,6 +9,7 @@ const ThemeSwitch: React.FC = () => {
 
   return (
     <button
+      data-testid="theme-switch"
       onClick={toggleTheme}
       className={`relative inline-flex items-center p-2 rounded-full border-2  ${
         theme === Theme.light

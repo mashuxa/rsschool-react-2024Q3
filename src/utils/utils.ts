@@ -1,5 +1,6 @@
 import { Person } from "src/types";
 import { createObjectCsvStringifier } from "csv-writer";
+import { ReadonlyURLSearchParams } from "next/navigation";
 
 export const generateCsvBlob = (data: Person[]): Blob => {
   const csvStringifier = createObjectCsvStringifier({
@@ -21,4 +22,17 @@ export const normalizePersons = (data: Person[]) => {
     ...data,
     id: data.url.slice(0, -1).split("/").pop() || "",
   }));
+};
+
+export const updateSearchParams = (
+  params: ReadonlyURLSearchParams,
+  newParams: Record<string, string>,
+): string => {
+  const urlParams = new URLSearchParams(params.toString());
+
+  Object.entries(newParams).forEach(([key, value]) => {
+    urlParams.set(key, value);
+  });
+
+  return urlParams.toString();
 };

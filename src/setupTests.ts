@@ -3,7 +3,10 @@ import { enableFetchMocks } from "jest-fetch-mock";
 
 enableFetchMocks();
 
-jest.mock("next/router", () => ({
-  ...jest.requireActual("next/router"),
+jest.mock("next/navigation", () => ({
+  ...jest.requireActual("next/navigation"),
   useRouter: jest.fn(),
+  usePathname: jest.fn(),
+  useParams: jest.fn(),
+  useSearchParams: jest.fn(),
 }));

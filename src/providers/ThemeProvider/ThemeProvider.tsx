@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, useState, useCallback, FC, useEffect } from "react";
 import { Theme, ThemeContextType, ThemeProviderProps } from "./types";
 

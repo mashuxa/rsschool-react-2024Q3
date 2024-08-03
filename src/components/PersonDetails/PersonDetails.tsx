@@ -1,11 +1,8 @@
-import { FC, useContext } from "react";
-import Link from "next/link";
-import { DataContext } from "src/providers/DataProvider/DataProvider";
+import { FC } from "react";
+import { Person } from "src/types";
 
-const PersonDetails: FC = () => {
-  const { details } = useContext(DataContext);
-
-  const {
+const PersonDetails: FC<{ data: Partial<Person> }> = ({
+  data: {
     name,
     height,
     mass,
@@ -14,17 +11,10 @@ const PersonDetails: FC = () => {
     eye_color,
     birth_year,
     gender,
-  } = details;
-
+  },
+}) => {
   return (
     <div data-testid="detailed-card" className="max-w-80 m-auto">
-      <Link
-        data-testid="details-card-close"
-        className="block border p-4 mb-4 bg-white hover:bg-blue-50"
-        href={"/"}
-      >
-        ✖ close
-      </Link>
       {
         <div className="card p-4 bg-gray-50 border-gray-300 rounded-md shadow-md">
           <h3

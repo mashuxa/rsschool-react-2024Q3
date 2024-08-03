@@ -1,3 +1,5 @@
+"use client";
+
 import { FC, useCallback, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearSelected } from "src/store/personsSlice/personsSlice";
