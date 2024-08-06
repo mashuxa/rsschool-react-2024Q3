@@ -1,6 +1,6 @@
 import mockData from '../__mocks__/persons.ts';
-import { generateCsvBlob, normalizePersons } from './utils.ts';
 import { Person } from '../types.ts';
+import { generateCsvBlob, normalizePersons } from './utils.ts';
 
 export const blobToData = (blob: Blob) => {
   return new Promise((resolve) => {

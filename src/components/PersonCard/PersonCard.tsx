@@ -1,8 +1,8 @@
+import { NavLink, useParams, useSearchParams } from '@remix-run/react';
 import { FC, useCallback } from 'react';
-import { Person } from '../../types.ts';
-import { NavLink, useParams, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { toggle } from '../../store/personsSlice/personsSlice.ts';
+import { toggle } from 'src/store/personsSlice/personsSlice.ts';
+import { Person } from 'src/types.ts';
 
 interface PersonCardProps extends Person {
   isSelected: boolean;

@@ -1,44 +1,44 @@
-import { FormEvent, FC, useState, useCallback, useRef, useMemo, useEffect } from 'react';
-import useLocalStorage from '../../hooks/useLocalStorage/useLocalStorage.ts';
-import Preloader from '../Preloader/Preloader.tsx';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from '@remix-run/react';
+import { FC, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import useLocalStorage from 'src/hooks/useLocalStorage/useLocalStorage.ts';
+import { clearSelected } from 'src/store/personsSlice/personsSlice.ts';
 import { DEFAULT_PAGE } from '../Pagination/Pagination.tsx';
-import api from '../../api/api.ts';
-import { clearSelected, updateCurrentPageData } from '../../store/personsSlice/personsSlice.ts';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store/store.ts';
 
 export const SEARCH_STORAGE_KEY = 'search';
 
 const SearchForm: FC = () => {
-  const { isLoading } = useSelector((state: RootState) => state.persons.currentPage);
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams({ page: DEFAULT_PAGE });
   const [search, setSearch] = useState<string | null>(null);
   const updateLocalStorage = useLocalStorage(SEARCH_STORAGE_KEY, setSearch);
   const inputRef = useRef<HTMLInputElement>(null);
-  const searchParam = useMemo(() => (search ? `&search=${search}` : ''), [search]);
-  const { data } = api.useGetPersonsQuery(`?${searchParams.toString()}${searchParam}`);
-
   const handleSubmit = useCallback(
     (event: FormEvent) => {
       event.preventDefault();
 
       if (inputRef.current) {
         updateLocalStorage(inputRef.current.value);
-        setSearchParams({ page: DEFAULT_PAGE });
         setSearch(inputRef.current.value);
         dispatch(clearSelected());
       }
     },
-    [dispatch, setSearchParams, updateLocalStorage],
+    [dispatch, updateLocalStorage],
   );
 
   useEffect(() => {
-    if (data) {
-      dispatch(updateCurrentPageData(data));
+    if (search !== null) {
+      setSearchParams((prev) => ({ ...prev, page: searchParams.get('page') || DEFAULT_PAGE, search }));
     }
-  }, [data, dispatch]);
+    // eslint-disable-next-line
+  }, [search]);
+
+  useEffect(() => {
+    const querySearch = searchParams.get('search') || '';
+
+    setSearch(querySearch);
+    updateLocalStorage(querySearch);
+  }, [updateLocalStorage, searchParams]);
 
   return (
     <div>
@@ -58,14 +58,10 @@ const SearchForm: FC = () => {
           data-testid="search-form-submit"
           type="submit"
           className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          disabled={isLoading}
         >
           Submit
         </button>
       </form>
-      <div className="flex-row">
-        <div className="text-center p-2">{isLoading && <Preloader />}</div>
-      </div>
     </div>
   );
 };

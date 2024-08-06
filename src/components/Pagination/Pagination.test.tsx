@@ -1,32 +1,30 @@
-import { render, fireEvent } from '@testing-library/react';
-import Pagination from './Pagination';
-import * as router from 'react-router-dom';
+import { useSearchParams } from '@remix-run/react';
+import { fireEvent } from '@testing-library/react';
 import { act } from 'react';
 import { Provider } from 'react-redux';
-import { createStore } from '../../store/store.ts';
-import mockData from '../../__mocks__/persons.ts';
+import { renderWithRemix } from 'src/__mocks__/renderWithRemix.tsx';
+import { createStore } from 'src/store/store.ts';
+import Pagination from './Pagination';
+
+jest.mock('@remix-run/react', () => ({
+  ...jest.requireActual('@remix-run/react'),
+  useSearchParams: jest.fn(),
+}));
 
 describe('Pagination Component', () => {
-  jest.mock('react-router-dom', () => ({
-    ...jest.requireActual('react-router-dom'),
-    useSearchParams: jest.fn(),
-  }));
-  const useSearchParamsSpy: jest.SpyInstance = jest.spyOn(router, 'useSearchParams');
+  const setSearchParamsMock = jest.fn();
   const mockStore = createStore({
     persons: {
-      currentPage: { results: mockData, count: 20 },
       selectedPersons: {},
     },
   });
 
+  (useSearchParams as jest.Mock).mockReturnValue([new URLSearchParams({}), setSearchParamsMock]);
+
   it('should updates URL query parameter when page changes', async () => {
-    const setParams = jest.fn();
-
-    useSearchParamsSpy.mockReturnValue([new URLSearchParams(), setParams]);
-
-    const { getByText } = render(
+    const { getByText } = renderWithRemix(
       <Provider store={mockStore}>
-        <Pagination />
+        <Pagination count={82} />
       </Provider>,
     );
     const page2Button = getByText('2');
@@ -35,6 +33,6 @@ describe('Pagination Component', () => {
       fireEvent.click(page2Button);
     });
 
-    expect(setParams).toHaveBeenCalledWith({ page: '2' });
+    expect(setSearchParamsMock).toHaveBeenCalledWith({ page: '2' });
   });
 });

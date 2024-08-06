@@ -1,31 +1,29 @@
-import { render, screen, fireEvent, act } from '@testing-library/react';
-import SearchForm from './SearchForm';
-import { useSearchParams } from 'react-router-dom';
-import { DEFAULT_PAGE } from '../Pagination/Pagination.tsx';
-import useLocalStorage from '../../hooks/useLocalStorage/useLocalStorage.ts';
-import { createStore, store } from '../../store/store.ts';
+import { useSearchParams } from '@remix-run/react';
+import { act, fireEvent, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import mockData from '../../__mocks__/persons.ts';
-import api from '../../api/api.ts';
+import { renderWithRemix } from 'src/__mocks__/renderWithRemix.tsx';
+import useLocalStorage from 'src/hooks/useLocalStorage/useLocalStorage.ts';
+import { store } from 'src/store/store.ts';
+import SearchForm from './SearchForm';
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+jest.mock('@remix-run/react', () => ({
+  ...jest.requireActual('@remix-run/react'),
   useSearchParams: jest.fn(),
 }));
-jest.mock('../../hooks/useLocalStorage/useLocalStorage.ts');
+jest.mock('src/hooks/useLocalStorage/useLocalStorage.ts');
 
 describe('SearchForm', () => {
   const updateLocalStorageMock = jest.fn();
   const setSearchParamsMock = jest.fn();
-  const useGetPersonsSpy: jest.SpyInstance = jest.spyOn(api, 'useGetPersonsQuery');
 
   (useLocalStorage as jest.Mock).mockReturnValue(updateLocalStorageMock);
-  (useSearchParams as jest.Mock).mockReturnValue([{}, setSearchParamsMock]);
+  (useSearchParams as jest.Mock).mockReturnValue([
+    new URLSearchParams({ page: '1', search: '123' }),
+    setSearchParamsMock,
+  ]);
 
   it('should call updateLocalStorage callback and setSearchParams on form submit', async () => {
-    useGetPersonsSpy.mockReturnValue({ data: { results: mockData, count: 3 } });
-
-    render(
+    renderWithRemix(
       <Provider store={store}>
         <SearchForm />
       </Provider>,
@@ -39,19 +37,12 @@ describe('SearchForm', () => {
       fireEvent.click(button);
     });
 
+    const mockCalls = setSearchParamsMock.mock.calls as [[jest.Mock], [jest.Mock]];
+    const updateFunction = mockCalls[1][0];
+    const newParams = updateFunction({});
+
+    expect(newParams).toEqual({ page: '1', search: 'test' });
+
     expect(updateLocalStorageMock).toHaveBeenCalledWith('test');
-    expect(setSearchParamsMock).toHaveBeenCalledWith({ page: DEFAULT_PAGE });
-  });
-
-  it('should show preloader on fetch', async () => {
-    const mockStore = createStore({ persons: { currentPage: { isLoading: true } } });
-
-    render(
-      <Provider store={mockStore}>
-        <SearchForm />
-      </Provider>,
-    );
-
-    expect(await screen.findByTestId('preloader')).toBeInTheDocument();
   });
 });

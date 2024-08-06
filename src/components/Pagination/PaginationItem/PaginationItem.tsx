@@ -1,5 +1,5 @@
+import { useSearchParams } from '@remix-run/react';
 import { FC, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
 
 interface PaginationItemProps {
   page: string;

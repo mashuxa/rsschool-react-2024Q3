@@ -1,9 +1,9 @@
+import { Link } from '@remix-run/react';
 import { FC, useCallback, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearSelected } from '../../store/personsSlice/personsSlice.ts';
-import { RootState } from '../../store/store.ts';
-import { generateCsvBlob } from '../../utils/utils.ts';
-import { Link } from 'react-router-dom';
+import { clearSelected } from 'src/store/personsSlice/personsSlice.ts';
+import { RootState } from 'src/store/store.ts';
+import { generateCsvBlob } from 'src/utils/utils.ts';
 
 const SelectionMenu: FC = () => {
   const dispatch = useDispatch();

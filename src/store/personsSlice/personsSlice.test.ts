@@ -1,4 +1,4 @@
-import personsReducer, { toggle, clearSelected, PersonsState } from './personsSlice';
+import personsReducer, { clearSelected, PersonsState, toggle } from './personsSlice';
 
 import { configureStore } from '@reduxjs/toolkit';
 import mockData from '../../__mocks__/persons.ts';
