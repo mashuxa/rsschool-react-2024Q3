@@ -1,18 +1,38 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { FetchDataType, Person } from '../types.ts';
-import { API_URL as baseUrl } from './constatnts.ts';
+import { normalizePersons } from '../utils/utils.ts';
+import { API_URL } from './constatnts.ts';
 
-export const api = createApi({
-  reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl }),
-  endpoints: (builder) => ({
-    getPersons: builder.query<FetchDataType<Person>, string>({
-      query: (queryParams: string) => `people${queryParams}`,
-    }),
-    getPerson: builder.query<Person, string>({
-      query: (id: string) => `people/${id}`,
-    }),
-  }),
-});
+const fetchData = async <T>(input: string | URL | globalThis.Request) => {
+  try {
+    const response = await fetch(input);
 
-export default api;
+    if (!response.ok) {
+      throw Error(response.statusText);
+    }
+
+    return (await response.json()) as Promise<T | undefined>;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+export const fetchPersons = async (page: string, search: string): Promise<FetchDataType<Person>> => {
+  const searchParam = search ? `&search=${search}` : '';
+  const persons = await fetchData<FetchDataType<Person>>(`${API_URL}/people?page=${page}${searchParam}`);
+
+  if (!persons) {
+    return { count: 0, results: [] };
+  }
+
+  return { ...persons, results: normalizePersons(persons.results) };
+};
+
+export const fetchDetails = async (id: string): Promise<Person> => {
+  const details = await fetchData<Person>(`${API_URL}/people/${id}`);
+
+  if (!details) {
+    return {} as Person;
+  }
+
+  return details;
+};

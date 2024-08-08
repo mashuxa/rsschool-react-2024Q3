@@ -1,19 +1,17 @@
-import { render, screen } from '@testing-library/react';
-import mockData from '../../__mocks__/persons.ts';
-import { BrowserRouter } from 'react-router-dom';
+import { screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
+import mockData from 'src/__mocks__/persons.ts';
+import { renderWithRemix } from 'src/__mocks__/renderWithRemix.tsx';
+import { store } from 'src/store/store.ts';
 import PersonCard from './PersonCard.tsx';
-import { store } from '../../store/store.ts';
 
 describe('PersonCard', () => {
   const data = mockData[0];
 
   test('should render relevant card data', () => {
-    render(
+    renderWithRemix(
       <Provider store={store}>
-        <BrowserRouter>
-          <PersonCard isSelected={false} {...data} />
-        </BrowserRouter>
+        <PersonCard isSelected={false} {...data} />
       </Provider>,
     );
     const link = screen.getByTestId('person-card');

@@ -1,5 +1,5 @@
-import { Person } from '../types.ts';
 import { createObjectCsvStringifier } from 'csv-writer';
+import { Person } from '../types.ts';
 
 export const generateCsvBlob = (data: Person[]): Blob => {
   const csvStringifier = createObjectCsvStringifier({

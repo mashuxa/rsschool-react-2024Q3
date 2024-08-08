@@ -1,4 +1,4 @@
-import { createContext, useState, useCallback, FC } from 'react';
+import { createContext, FC, useCallback, useEffect, useState } from 'react';
 import { Theme, ThemeContextType, ThemeProviderProps } from './types.ts';
 
 const defaultThemeContext: ThemeContextType = { theme: Theme.light, toggleTheme: () => {} };
@@ -6,23 +6,7 @@ const defaultThemeContext: ThemeContextType = { theme: Theme.light, toggleTheme:
 export const ThemeContext = createContext<ThemeContextType>(defaultThemeContext);
 
 export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
-  const getInitialTheme = (): Theme => {
-    const savedTheme = localStorage.getItem('theme');
-
-    if (savedTheme) {
-      return savedTheme as Theme;
-    }
-
-    const matchMediaTheme =
-      window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? Theme.dark : Theme.light;
-
-    localStorage.setItem('theme', matchMediaTheme);
-
-    return matchMediaTheme;
-  };
-
-  const [theme, setTheme] = useState<Theme>(getInitialTheme);
-
+  const [theme, setTheme] = useState<Theme>(Theme.light);
   const toggleTheme = useCallback(() => {
     setTheme((prevTheme) => {
       const newTheme = prevTheme === Theme.light ? Theme.dark : Theme.light;
@@ -31,6 +15,21 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({ children }) => {
 
       return newTheme;
     });
+  }, []);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+
+    if (savedTheme) {
+      setTheme(savedTheme as Theme);
+    } else {
+      const matchMediaTheme =
+        window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? Theme.dark : Theme.light;
+
+      localStorage.setItem('theme', matchMediaTheme);
+
+      setTheme(matchMediaTheme);
+    }
   }, []);
 
   return (

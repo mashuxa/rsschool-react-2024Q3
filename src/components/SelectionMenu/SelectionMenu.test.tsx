@@ -1,10 +1,10 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router-dom';
-import SelectionMenu from './SelectionMenu.tsx';
-import mockData from '../../__mocks__/persons.ts';
-import { createStore } from '../../store/store.ts';
+import { fireEvent, screen } from '@testing-library/react';
 import { act } from 'react';
+import { Provider } from 'react-redux';
+import mockData from 'src/__mocks__/persons.ts';
+import { renderWithRemix } from 'src/__mocks__/renderWithRemix.tsx';
+import { createStore } from 'src/store/store.ts';
+import SelectionMenu from './SelectionMenu.tsx';
 
 describe('SelectionMenu', () => {
   const mockStore = createStore({ persons: { selectedPersons: { '1': mockData[0], '2': mockData[1] } } });
@@ -13,11 +13,9 @@ describe('SelectionMenu', () => {
   mockStore.dispatch = dispatchMock;
 
   beforeEach(() => {
-    render(
+    renderWithRemix(
       <Provider store={mockStore}>
-        <BrowserRouter>
-          <SelectionMenu />
-        </BrowserRouter>
+        <SelectionMenu />
       </Provider>,
     );
   });
