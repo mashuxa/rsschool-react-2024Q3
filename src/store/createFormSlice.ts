@@ -1,16 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-export interface FormValues {
-  name: string;
-  age: number;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  gender: string;
-  acceptTerms: boolean;
-  picture: string;
-  country: string;
-}
+import { FormValues } from "../types.ts";
 
 const initialFormState: FormValues = {
   name: "",

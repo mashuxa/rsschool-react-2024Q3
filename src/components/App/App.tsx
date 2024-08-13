@@ -12,7 +12,7 @@ const App: FC = () => {
       <button className="block p-4 text-slate-50 font-medium bg-slate-500" onClick={goBack}>
         ⮌ Back
       </button>
-      <div className="p-4 overflow-y-auto">
+      <div className="p-4 pt-20 overflow-y-auto grow">
         <Outlet />
       </div>
     </div>
