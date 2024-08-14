@@ -10,6 +10,10 @@ export enum FormFields {
   Country = "country",
 }
 
+interface Image {
+  base64Picture?: string;
+}
+
 export interface FormValues {
   name: string;
   age: number;
@@ -17,7 +21,9 @@ export interface FormValues {
   password: string;
   confirmPassword: string;
   gender: string;
-  acceptTerms: boolean;
-  picture: string;
+  acceptTerms: NonNullable<"" | "on" | undefined>;
+  picture: FileList;
   country: string;
 }
+
+export type StoreFormValues = Omit<FormValues, "picture"> & Image;

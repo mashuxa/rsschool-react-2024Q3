@@ -23,23 +23,23 @@ export const validationSchema = Yup.object().shape({
     .oneOf([Yup.ref("password"), undefined], "Passwords must match")
     .required("Confirm Password is required"),
   gender: Yup.string().required("Gender is required"),
-  acceptTerms: Yup.boolean()
-    .oneOf([true], "You must accept the terms and conditions")
+  acceptTerms: Yup.string()
+    .oneOf(["on", ""], "You must accept the terms and conditions")
     .required("You must accept the terms and conditions"),
-  picture: Yup.mixed()
+  picture: Yup.mixed<FileList>()
+    .test("fileSize", "File size too large", (list) => {
+      if (!list?.length) return true;
 
-    .test("fileSize", "File size too large", (value) => {
-      if (!value) return true;
-
-      return (value as File).size <= MAX_SIZE_BYTES;
+      return list[0].size <= MAX_SIZE_BYTES;
     })
-    .test("fileType", "Unsupported file format", (value) => {
-      if (!value) return true;
+    .test("fileSize", "Unsupported file format", (list) => {
+      if (!list?.length) return true;
 
-      return VALID_TYPES.includes((value as File).type);
+      return VALID_TYPES.includes(list[0].type);
     })
-    .test("fileExists", "Picture is required", (value) => {
-      return value && value instanceof File && value.size > 0 && value.name !== "";
-    }),
+    .test("fileExists", "Picture is required", (list) => {
+      return !!list?.length;
+    })
+    .required("Required"),
   country: Yup.string().required("Country is required"),
 });

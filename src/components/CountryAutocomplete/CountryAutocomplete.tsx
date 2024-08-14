@@ -1,17 +1,21 @@
-import { FC, useRef, useState } from "react";
+import { FC, InputHTMLAttributes, useRef, useState } from "react";
+import { UseFormSetValue, UseFormTrigger } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { errorStyles, inputStyles } from "../../styles.ts";
+import { FormValues } from "../../types.ts";
 
 const labelStyles = "block mb-1 font-semibold";
 
-interface CountryAutocompleteProps {
+interface CountryAutocompleteProps extends InputHTMLAttributes<HTMLSelectElement> {
   label: string;
-  name: string;
-  error?: string;
+  name: keyof FormValues;
+  errors: Record<string, string>;
+  setValue?: UseFormSetValue<FormValues>;
+  trigger?: UseFormTrigger<FormValues>;
 }
 
-const CountryAutocomplete: FC<CountryAutocompleteProps> = ({ label, name, error }) => {
+const CountryAutocomplete: FC<CountryAutocompleteProps> = ({ label, name, errors, setValue, trigger }) => {
   const countries = useSelector((state: RootState) => state.countries);
   const inputRef = useRef<HTMLInputElement>(null);
   const [suggestions, setSuggestions] = useState<string[]>(countries);
@@ -19,6 +23,14 @@ const CountryAutocomplete: FC<CountryAutocompleteProps> = ({ label, name, error 
 
   const handleInputChange = () => {
     const inputValue = inputRef.current?.value || "";
+
+    if (setValue) {
+      setValue(name, inputValue);
+    }
+
+    if (trigger) {
+      void trigger(name);
+    }
 
     if (inputValue.trim() === "") {
       setSuggestions(countries);
@@ -34,6 +46,14 @@ const CountryAutocomplete: FC<CountryAutocompleteProps> = ({ label, name, error 
   const handleSuggestionClick = (suggestion: string) => {
     if (inputRef.current) {
       inputRef.current.value = suggestion;
+    }
+
+    if (setValue) {
+      setValue(name, suggestion);
+    }
+
+    if (trigger) {
+      void trigger(name);
     }
 
     setSuggestions(countries);
@@ -69,7 +89,7 @@ const CountryAutocomplete: FC<CountryAutocompleteProps> = ({ label, name, error 
           ))}
         </ul>
       )}
-      <p className={errorStyles}>{error || " "}</p>
+      <p className={errorStyles}>{errors[name] || " "}</p>
     </div>
   );
 };

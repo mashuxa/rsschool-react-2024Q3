@@ -1,39 +1,71 @@
 import { ChangeEvent, FC, InputHTMLAttributes, useState } from "react";
+import { UseFormRegister, UseFormSetValue, UseFormTrigger } from "react-hook-form";
 import { errorStyles, inputStyles, labelStyles } from "../../styles.ts";
+import { FormValues } from "../../types.ts";
 import PasswordStrength from "../PasswordStrength/PasswordStrength.tsx";
 import { Tests } from "../PasswordStrength/types.ts";
 
-interface SelectPropsProps extends InputHTMLAttributes<HTMLInputElement> {
+interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  name: string;
+  name: keyof FormValues;
   errors: Record<string, string>;
+  className?: string;
+  register?: UseFormRegister<FormValues>;
+  setValue?: UseFormSetValue<FormValues>;
+  trigger?: UseFormTrigger<FormValues>;
 }
 
-const FormField: FC<SelectPropsProps> = ({ label, name, errors, className, ...inputProps }) => {
+const FormField: FC<FormFieldProps> = ({ label, name, errors, className, register, type, setValue, trigger }) => {
   const [passedTests, setPassedTests] = useState<Tests[]>([]);
   const [inFocus, setInFocus] = useState(false);
 
-  const handleInputChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
-    const value = target.value;
+  const handleFocus = () => setInFocus(true);
 
-    if (/\d/.test(value)) {
-      setPassedTests((prev) => [...prev, Tests.number]);
+  const inputProps = register && register(name);
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (inputProps?.onChange) {
+      void inputProps.onChange(event);
     }
 
-    if (/[A-Z]/.test(value)) {
-      setPassedTests((prev) => [...prev, Tests.uppercasedLetter]);
-    }
+    if (type === "checkbox") {
+      if (setValue) {
+        setValue(name, event.currentTarget.checked ? "on" : "");
+      }
 
-    if (/[a-z]/.test(value)) {
-      setPassedTests((prev) => [...prev, Tests.lowercasedLetter]);
-    }
+      if (trigger) {
+        void trigger(name);
+      }
+    } else if (type === "password") {
+      const value = event.target.value;
+      const passedTests = [];
 
-    if (/[^A-Za-z0-9]/.test(value)) {
-      setPassedTests((prev) => [...prev, Tests.specialCharacter]);
+      if (/\d/.test(value)) {
+        passedTests.push(Tests.number);
+      }
+
+      if (/[A-Z]/.test(value)) {
+        passedTests.push(Tests.uppercasedLetter);
+      }
+
+      if (/[a-z]/.test(value)) {
+        passedTests.push(Tests.lowercasedLetter);
+      }
+
+      if (/[^A-Za-z0-9]/.test(value)) {
+        passedTests.push(Tests.specialCharacter);
+      }
+
+      setPassedTests(passedTests);
     }
   };
-  const handleFocus = () => setInFocus(true);
-  const handleBlur = () => setInFocus(false);
+  const handleBlur = (event: ChangeEvent<HTMLInputElement>) => {
+    if (inputProps?.onBlur) {
+      void inputProps.onBlur(event);
+    }
+
+    setInFocus(false);
+  };
 
   return (
     <div className="relative">
@@ -41,15 +73,16 @@ const FormField: FC<SelectPropsProps> = ({ label, name, errors, className, ...in
         {label}:
       </label>
       <input
-        {...inputProps}
         id={name}
         name={name}
         className={`${inputStyles} ${className}`}
-        onChange={inputProps.type === "password" ? handleInputChange : undefined}
+        type={type}
+        onChange={handleChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
+        {...(type !== "checkbox" && inputProps && { ref: inputProps.ref })}
       />
-      {inputProps.type === "password" && inFocus && <PasswordStrength passedTests={passedTests} />}
+      {type === "password" && inFocus && <PasswordStrength passedTests={passedTests} />}
       <p className={errorStyles}>{errors[name] || " "}</p>
     </div>
   );

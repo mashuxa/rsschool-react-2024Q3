@@ -1,27 +1,25 @@
 import { FC } from "react";
-import { FormFields, FormValues } from "../../../types.ts";
+import { FormFields, StoreFormValues } from "../../../types.ts";
 
 interface CellDataProps {
-  data: FormValues;
+  data: StoreFormValues;
   fieldName: FormFields;
 }
 
 const CellData: FC<CellDataProps> = ({ fieldName, data }) => {
-  const value = data[fieldName];
-
-  if (!value) {
-    return "No data";
-  }
-
   if (fieldName === FormFields.Picture) {
-    return <img src={value as string} alt="img" />;
+    return data.base64Picture ? <img src={data.base64Picture} alt="img" /> : "No image";
   }
 
   if (fieldName === FormFields.AcceptTerms) {
-    return value ? "✅" : "❎";
+    return data[fieldName] === "on" ? "✅" : "❎";
   }
 
-  return value;
+  if (!data[fieldName]) {
+    return "No data";
+  }
+
+  return data[fieldName];
 };
 
 export default CellData;

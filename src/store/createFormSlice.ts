@@ -1,16 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { FormValues } from "../types.ts";
+import { StoreFormValues } from "../types.ts";
 
-const initialFormState: FormValues = {
+const initialFormState: StoreFormValues = {
+  acceptTerms: "",
   name: "",
   age: 0,
   email: "",
   password: "",
   confirmPassword: "",
   gender: "",
-  acceptTerms: false,
-  picture: "",
   country: "",
+  base64Picture: "",
 };
 
 const createFormSlice = (name: string) => {
@@ -18,7 +18,7 @@ const createFormSlice = (name: string) => {
     name,
     initialState: initialFormState,
     reducers: {
-      setValues(state, action: PayloadAction<Partial<FormValues>>) {
+      setValues(state, action: PayloadAction<Partial<StoreFormValues>>) {
         return { ...state, ...action.payload };
       },
       resetValues() {

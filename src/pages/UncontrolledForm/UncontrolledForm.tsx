@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from "react";
+import { FC, FormEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
@@ -6,17 +6,14 @@ import CountryAutocomplete from "../../components/CountryAutocomplete/CountryAut
 import FileUploadField from "../../components/FileUploadField/FileUploadField";
 import FormField from "../../components/FormField/FormField.tsx";
 import Select from "../../components/Select/Select.tsx";
+import { genderOptions } from "../../constants.ts";
 import { setValues } from "../../store/slices/uncontrolledFormSlice";
+import { buttonStyles, formStyles } from "../../styles.ts";
 import { FormFields } from "../../types.ts";
 import { convertFileToBase64 } from "../../utils/utils.ts";
 import { validationSchema } from "../../validationSchema";
 
-const buttonStyles = "bg-blue-500 text-white py-2 px-4 rounded mt-4";
-const genderOptions = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
-];
-const UncontrolledFormComponent: React.FC = () => {
+const UncontrolledFormComponent: FC = () => {
   const dispatch = useDispatch();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitDisabled, setIsSubmitDisabled] = useState<boolean>(false);
@@ -26,14 +23,16 @@ const UncontrolledFormComponent: React.FC = () => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    const { acceptTerms, ...formValues } = Object.fromEntries(formData.entries());
-    const values = { ...formValues, acceptTerms: acceptTerms === "on" };
+    const values = Object.fromEntries(formData.entries());
+    const fileList = formData.getAll(FormFields.Picture) as unknown;
 
     try {
-      await validationSchema.validate(values, { abortEarly: false });
-      const base64Picture = await convertFileToBase64(formValues.picture as File);
+      await validationSchema.validate({ ...values, picture: fileList }, { abortEarly: false });
+      const base64Picture = await convertFileToBase64(fileList as FileList);
+      // eslint-disable-next-line
+      const { picture, ...rest } = values;
 
-      dispatch(setValues({ ...values, picture: base64Picture }));
+      dispatch(setValues({ ...rest, base64Picture }));
       setErrors({});
       navigate("/", { state: { success: true } });
     } catch (error) {
@@ -57,7 +56,7 @@ const UncontrolledFormComponent: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} onChange={handleChangeForm} className="max-w-5xl m-auto grid grid-cols-2 gap-3">
+    <form onSubmit={handleSubmit} onChange={handleChangeForm} className={formStyles}>
       <FormField name={FormFields.Name} label="Name" errors={errors} />
       <FormField name={FormFields.Age} label="Age" errors={errors} type="text" min={0} />
       <FormField name={FormFields.Email} label="Email" errors={errors} type="text" />
@@ -66,7 +65,7 @@ const UncontrolledFormComponent: React.FC = () => {
       <FormField name={FormFields.ConfirmPassword} label="Confirm Password" errors={errors} type="password" />
       <FormField name={FormFields.AcceptTerms} label="Accept Terms" errors={errors} type="checkbox" className="w-4" />
       <FileUploadField label="Upload Picture" name={FormFields.Picture} errors={errors} />
-      <CountryAutocomplete label="Country" name={FormFields.Country} error={errors.country} />
+      <CountryAutocomplete label="Country" name={FormFields.Country} errors={errors} />
       <div className="col-span-2">
         <button type="submit" className={`${buttonStyles} disabled:grayscale`} disabled={isSubmitDisabled}>
           Submit
